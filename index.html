@@ -1,1 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Leave Cognition Analyzer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f4; }
+    h1 { color: #2c3e50; }
+    textarea { width: 100%; height: 150px; padding: 10px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 10px; }
+    .result { margin-top: 20px; background: #fff; padding: 15px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+<h1>🧠 Leave Cognition Analyzer</h1>
+<p>This tool analyzes why you might be avoiding taking leave and gives a healthy behavioral nudge.</p>
+
+<textarea id="userInput" placeholder="Why haven’t you taken a vacation recently?"></textarea><br>
+<button onclick="analyze()">Analyze</button>
+
+<div class="result" id="output"></div>
+
+<script>
+  function analyze() {
+    const text = document.getElementById("userInput").value.toLowerCase();
+    let bias = "Unclassified cognition";
+    let nudge = "Try reflecting more or discussing this with a peer.";
+
+    if (text.includes("performance") || text.includes("review")) {
+      bias = "Loss aversion / Fear of evaluation";
+      nudge = "Rest helps performance. Taking leave supports productivity.";
+    } else if (text.includes("workload") || text.includes("pile")) {
+      bias = "Anticipatory stress";
+      nudge = "Delegate early. Plan return workflows to ease stress.";
+    } else if (text.includes("manager") && (text.includes("never") || text.includes("always working"))) {
+      bias = "Managerial modeling bias";
+      nudge = "Good leaders rest. Advocate for healthy team norms.";
+    } else if (text.includes("billing")) {
+      bias = "Financial anxiety bias";
+      nudge = "Planned leaves rarely hurt billing. Communicate early.";
+    } else if (text.includes("client") || text.includes("front")) {
+      bias = "Situational bias";
+      nudge = "Set up pre-approved coverage plans and inform clients.";
+    } else if (text.includes("understaffed")) {
+      bias = "Guilt-driven bias";
+      nudge = "You deserve rest. Raise resourcing concerns if needed.";
+    } else if (text.includes("crucial") || text.includes("indispensable")) {
+      bias = "Self-importance distortion";
+      nudge = "Build backups. You're important—but not irreplaceable.";
+    } else if (text.includes("others") && (text.includes("not taking") || text.includes("no one"))) {
+      bias = "Conformity bias";
+      nudge = "Be the change. Normalize taking well-deserved breaks.";
+    } else if (text.includes("lazy") || text.includes("not valuable")) {
+      bias = "Identity-based bias";
+      nudge = "Your worth isn't tied to presence. Rest is strength.";
+    }
+
+    document.getElementById("output").innerHTML = `
+      <h3>✅ Bias Detected:</h3>
+      <p><strong>${bias}</strong></p>
+      <h3>💡 Suggested Nudge:</h3>
+      <p>${nudge}</p>
+    `;
+  }
+</script>
+
+</body>
+</html>
 
