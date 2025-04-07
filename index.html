@@ -1,70 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Leave Cognition Analyzer</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f4; }
-    h1 { color: #2c3e50; }
-    textarea { width: 100%; height: 150px; padding: 10px; font-size: 16px; }
-    button { padding: 10px 20px; font-size: 16px; margin-top: 10px; }
-    .result { margin-top: 20px; background: #fff; padding: 15px; border-radius: 5px; }
-  </style>
-</head>
-<body>
+# AI Website Prototype: Leave Bias Cognition Analyzer & Nudge Recommender
+# MVP using Streamlit
 
-<h1>🧠 Leave Cognition Analyzer</h1>
-<p>This tool analyzes why you might be avoiding taking leave and gives a healthy behavioral nudge.</p>
+import streamlit as st
 
-<textarea id="userInput" placeholder="Why haven’t you taken a vacation recently?"></textarea><br>
-<button onclick="analyze()">Analyze</button>
+st.set_page_config(page_title="Leave Cognition Nudge Assistant", layout="wide")
+st.title("Employee Leave Cognition Analyzer")
 
-<div class="result" id="output"></div>
+st.markdown("""
+This interactive tool helps employees reflect on their thought patterns about taking vacation or personal leave.
+It begins with common behavioral reasons and then invites open reflection to identify cognitive biases and recommend tailored nudges.
 
-<script>
-  function analyze() {
-    const text = document.getElementById("userInput").value.toLowerCase();
-    let bias = "Unclassified cognition";
-    let nudge = "Try reflecting more or discussing this with a peer.";
+## How It Works and Ties into Behavioral Dynamics
 
-    if (text.includes("performance") || text.includes("review")) {
-      bias = "Loss aversion / Fear of evaluation";
-      nudge = "Rest helps performance. Taking leave supports productivity.";
-    } else if (text.includes("workload") || text.includes("pile")) {
-      bias = "Anticipatory stress";
-      nudge = "Delegate early. Plan return workflows to ease stress.";
-    } else if (text.includes("manager") && (text.includes("never") || text.includes("always working"))) {
-      bias = "Managerial modeling bias";
-      nudge = "Good leaders rest. Advocate for healthy team norms.";
-    } else if (text.includes("billing")) {
-      bias = "Financial anxiety bias";
-      nudge = "Planned leaves rarely hurt billing. Communicate early.";
-    } else if (text.includes("client") || text.includes("front")) {
-      bias = "Situational bias";
-      nudge = "Set up pre-approved coverage plans and inform clients.";
-    } else if (text.includes("understaffed")) {
-      bias = "Guilt-driven bias";
-      nudge = "You deserve rest. Raise resourcing concerns if needed.";
-    } else if (text.includes("crucial") || text.includes("indispensable")) {
-      bias = "Self-importance distortion";
-      nudge = "Build backups. You're important—but not irreplaceable.";
-    } else if (text.includes("others") && (text.includes("not taking") || text.includes("no one"))) {
-      bias = "Conformity bias";
-      nudge = "Be the change. Normalize taking well-deserved breaks.";
-    } else if (text.includes("lazy") || text.includes("not valuable")) {
-      bias = "Identity-based bias";
-      nudge = "Your worth isn't tied to presence. Rest is strength.";
-    }
+This tool is designed based on the behavioral dynamics framework (Motivation -> Cognition -> Emotion -> Behavior), and integrates environmental factors like mandates, persuasion, and nudges.
 
-    document.getElementById("output").innerHTML = `
-      <h3>✅ Bias Detected:</h3>
-      <p><strong>${bias}</strong></p>
-      <h3>💡 Suggested Nudge:</h3>
-      <p>${nudge}</p>
-    `;
-  }
-</script>
+- **Motivation**: The employee may be motivated to rest but hesitates due to implicit pressure.
+- **Cognition**: Through text input and guided options, the user reveals hidden biases (e.g., fear of judgment, indispensability, billing issues).
+- **Emotion**: These thoughts are often emotionally charged (guilt, anxiety, fear of being left out).
+- **Behavior**: The resulting behavior is inaction—i.e., not taking leave despite being eligible.
+- **Nudge Architecture**: The app provides a supportive intervention (nudge) that is psychologically matched to the specific cognitive bias, helping reframe the situation.
 
-</body>
-</html>
+This framework is supported by research studies showing that self-efficacy, anticipated workload stress, and workplace culture strongly influence employees' decision to take or skip time off (Hahn et al., 2011; Smit & Barber, 2016; Ferguson et al., 2015).
+
+Additional support from real-world organizational reports indicates that resistance to transparency, fear of being perceived as non-performant, and cultural norms perpetuate burnout cycles if not corrected through digital behavioral nudging (MDE Individual Assignment Report, 2024).
+""")
+
+st.subheader("Select a Common Reason (Optional)")
+options = [
+    "My manager never takes leave",
+    "Too much workload will pile up",
+    "I'm too crucial to the team",
+    "Clients can't be left alone",
+    "Team lacks maturity to manage alone",
+    "Fear of being seen as lazy",
+    "Billing may be affected",
+    "Everyone else is always working"
+]
+
+selected_reason = st.selectbox("Pick a reason or proceed to reflect on your own:", options + ["Other / Prefer to write my own"])
+
+st.subheader("Reflect Freely")
+response = st.text_area(
+    "Why haven't you taken a vacation recently, even if you were eligible?",
+    height=200,
+    placeholder="e.g., I worry that taking time off will look bad during performance reviews, or I feel guilty leaving the team understaffed."
+)
+
+if st.button("Analyze Response"):
+    input_text = response.lower() + " " + selected_reason.lower()
+    bias = ""
+    nudge = ""
+    action = ""
+
+    if "performance" in input_text or "review" in input_text:
+        bias = "Loss aversion / Fear of poor evaluation"
+        nudge = "Managers should affirm that vacation is part of long-term high performance."
+        action = "Read: Harvard Business Review article on how time off improves leadership."
+    elif "workload" in input_text or "pile up" in input_text:
+        bias = "Anticipatory stress"
+        nudge = "Create a buffer system using delegation tools and phased return SOPs."
+        action = "Try a task-delegation planner: https://todoist.com"
+    elif "others" in input_text or "no one else" in input_text:
+        bias = "Conformity bias"
+        nudge = "Display recent leave trends or highlight team members who recently took breaks."
+        action = "Start a 'Rest Wall' in your team’s Slack or Teams workspace."
+    elif "visible" in input_text or "forgotten" in input_text:
+        bias = "FOMO / Scarcity Mindset"
+        nudge = "Normalize break visibility through automated OOO updates and calendar transparency."
+        action = "Use Google Calendar's OOO feature to signal time off."
+    elif "manager doesn’t mean it" in input_text or "mixed signals" in input_text:
+        bias = "Interpretational Bias"
+        nudge = "Make top-down communication of leave benefits more explicit."
+        action = "Propose a wellness session in your next team meeting."
+    elif "lazy" in input_text or "not valuable" in input_text:
+        bias = "Identity-based bias"
+        nudge = "Train teams to see recovery as a professional strength."
+        action = "Listen to 'The Power of Rest' TED Talk."
+    elif "workaholic" in input_text or "manager works all the time" in input_text:
+        bias = "Managerial modeling bias"
+        nudge = "Leaders should model breaks openly—both verbally and by example."
+        action = "Encourage manager to share time-off stories in team chat."
+    elif "crucial" in input_text or "indispensable" in input_text:
+        bias = "Self-importance distortion"
+        nudge = "Develop role resilience by mapping backup workflows."
+        action = "Use a coverage checklist before going on leave."
+    elif "billing" in input_text:
+        bias = "Financial anxiety bias"
+        nudge = "Use time tracking and modeling to showcase how leave doesn’t impact billing goals."
+        action = "Log a buffer in your project management tool."
+    elif "understaffed" in input_text:
+        bias = "Guilt-driven bias"
+        nudge = "Integrate weekly wellness heatmaps to monitor effort equity."
+        action = "Tag HR or team leads about staffing coverage."
+    elif "client" in input_text or "front-facing" in input_text:
+        bias = "Situational bias"
+        nudge = "Design pre-approved coverage plans and client transition templates."
+        action = "Send out a client handover mail template."
+    elif "maturity" in input_text or "team can't handle" in input_text:
+        bias = "Trust deficit cognition"
+        nudge = "Initiate rotation-based leadership assignments to promote readiness."
+        action = "Host a buddy system or mock handover trial."
+    else:
+        bias = "Unclassified cognition"
+        nudge = "Consider journaling the resistance or discussing with HR or a peer."
+        action = "Use a private journaling app like Penzu to reflect."
+
+    st.success("Analysis Complete")
+    st.markdown(f"**Identified Bias:** {bias}")
+    st.markdown(f"**Recommended Nudge:** {nudge}")
+    st.markdown(f"**Suggested Action/Resource:** {action}")
+
+st.markdown("---")
+st.caption("This prototype respects your privacy. No data is stored. Built to support healthier workplace behavior based on behavioral psychology research and enterprise case studies.")
+
+# Call to Action Section
+st.markdown("### 🗓️ Ready to Act?")
+st.markdown("Use your insights to plan a break now. Even a short one helps you recharge.")
+st.markdown("[Click here to schedule your time off](https://calendar.google.com) or set a reminder in your work calendar.")
+
 
